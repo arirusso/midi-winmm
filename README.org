@@ -1,0 +1,43 @@
+#+COMMENT: -*- org -*-
+#+TITLE: MIDI WinMM
+#+AUTHOR: Ari Russo
+#+DATE: 2010-12-10 Fri
+#+TEXT: Realtime MIDI input and output with Ruby for Windows.
+#+KEYWORDS: MIDI, ruby, WinMM, windows, music, audio, sysex
+#+LANGUAGE:  en
+#+LINK_HOME: http://github.com/arirusso/midi-winmm
+
+Author:: Ari Russo
+
+Copyright:: Copyright (c) 2010-2011 Ari Russo
+
+* Summary
+
+A Ruby library for performing realtime MIDI input and output in Windows.  Uses the WinMM API
+
+* Features
+
+	- Full input and output
+	- Handle all MIDI Message types (including SysEx)
+	- Timestamped input messages
+
+* Requirements
+
+	- [[https://github.com/ffi/ffi][ffi]] (gem install ffi)
+	- Ruby 1.9.2 or newer
+
+* Install
+
+	- gem install midi-winmm
+	
+* Examples
+
+	- see examples/ directory
+	
+* Tests
+
+	- please see test/config.rb before running tests
+	
+* License
+
+Apache 2.0, See the file LICENSE  
