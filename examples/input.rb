@@ -10,15 +10,15 @@ num_messages = 10
 
 # MIDIWinMM::Device.all.to_s will list your midi outputs
 
-MIDIWinMM::Device.first(:input).enable do |input|
+MIDIWinMM::Input.first.open do |input|
 
   $>.puts "send some MIDI to your input now..."
 
   num_messages.times do
-    m = input.read
+    m = input.gets
     $>.puts(m)
   end
 
-  $>.puts "finished"
-
 end
+
+$>.puts "finished"

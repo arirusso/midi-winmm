@@ -45,7 +45,7 @@ module MIDIWinMM
       all_by_type[type].last
     end
     
-    WinmmCallbackFlag = 0x30000 # this flag tells winmm that we plan to use a callback
+    WinmmCallbackFlag = 0x30000 # we plan to use a callback to collect events
     
     private
     
@@ -63,8 +63,6 @@ module MIDIWinMM
       (1..m.length).step(2) { |i| s << m[(m.length-i)-1, 2] }
       s
     end
-    
-    # shortcuts
     
     def error?(num)
       Map::error?(num)

@@ -24,6 +24,8 @@ module MIDIWinMM
         end
       end
     end
+    alias_method :start, :enable
+    alias_method :open, :enable
 
     # close this device
     def close
@@ -54,12 +56,19 @@ module MIDIWinMM
       Map.winmm_func(:midiOutReset, @handle)
     end
     
-    def output_message(*message_bytes)
+    def puts(*a)
+      case a.first
+        when Array    then puts_bytes(a)
+        when Numeric  then puts_bytes(a) 
+        when String   then puts_bytestr(a)
+      end
+    end
+    
+    def puts_bytes(message_bytes)
       format = "C" * message_bytes.size
       
       packed = message_bytes.pack(format)
-      data_pointer = FFI::MemoryPointer.new(:char, Output::BufferSize)
-      data_pointer.put_string(0, packed)
+      data_pointer = FFI::MemoryPointer.new(message_bytes.size).put_bytes(0, packed)
       
       @header[:dwBufferLength] = message_bytes.size
       @header[:dwBytesRecorded] = message_bytes.size
@@ -71,7 +80,27 @@ module MIDIWinMM
       
     end
     
-    alias_method :message, :output_message
+    # this takes a String of hex digits 
+    def puts_bytestr(data)
+      data = data.dup
+	  output = []
+      until (str = data.slice!(0,2)).eql?("")
+      	output << str.hex
+      end
+      puts_bytes(*output)
+    end
+    
+    def self.first
+      Device::first(:output)
+    end
+
+    def self.last
+      Device::last(:output)
+    end
+    
+    def self.all
+      Device.all_by_type[:output]
+    end
     
     private
     

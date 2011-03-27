@@ -11,6 +11,13 @@ module MIDIWinMM
     ffi_lib 'Winmm'
     ffi_convention :stdcall
     
+    HeaderFlags = {
+      0x00000001 => :done,
+      0x00000002 => :prepared,
+      0x00000004 => :inqueue,
+      0x00000008 => :isstream
+    }
+    
     CallbackMessageTypes = {
       0x3C1 => :input_open,
       0x3C2 => :input_close,

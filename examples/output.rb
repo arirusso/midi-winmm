@@ -11,15 +11,13 @@ duration = 0.1
 
 # MIDIWinMM::Device.all.to_s will list your midi outputs
   
-output = MIDIWinMM::Device.first(:output)
-output.enable do |output|
+MIDIWinMM::Output.first.open do |output|
 
-  5.times do |i|
+  (0..((octaves-1)*12)).step(12) do |oct|
     notes.each do |note|
-      oct = i * 12
-      output.output_message(0x90, note + oct, 100)
+      output.puts(0x90, note + oct, 100)
       sleep(duration)
-      output.output_message(0x80, note + oct, 100)
+      output.puts(0x80, note + oct, 100)
     end
   end
   

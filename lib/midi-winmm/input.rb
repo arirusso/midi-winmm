@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 module MIDIWinMM
-
+  
   #
   # Input device class for the WinMM driver interface 
   #
@@ -9,25 +9,27 @@ module MIDIWinMM
     include Device
     
     BufferSize = 2048
-
+    
     # initializes this device
     def enable(options = {}, &block)
       init_input_buffer
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      @event_callback = event_callback
+      @buffer = []
+      @event_callback = get_event_callback
       
       Map.winmm_func(:midiInOpen, handle_ptr, @id, @event_callback, @header[:lpData].address, Device::WinmmCallbackFlag)
       
       @handle = handle_ptr.read_int
-
+      
       Map.winmm_func(:midiInPrepareHeader, @handle, @header.pointer, @header.size)      
       Map.winmm_func(:midiInAddBuffer, @handle, @header.pointer, @header.size)
       Map.winmm_func(:midiInStart, @handle)
 
+      spawn_listener
       @enabled = true
-
-            unless block.nil?
-      begin
+      
+      unless block.nil?
+        begin
           block.call(self)
         ensure
           close
@@ -35,6 +37,8 @@ module MIDIWinMM
       end
       
     end
+    alias_method :start, :enable
+    alias_method :open, :enable
     
     #
     # returns an array of MIDI event hashes as such:
@@ -44,39 +48,45 @@ module MIDIWinMM
     #   { :data => "90607F", :timestamp => 1200 }
     # ]
     #
-    def read_buffer
-      result = nil
-      messages = @header.data.split(',')
-      message = messages.shift
-      unless message.nil?
-        timestamp, data = message.split('#')
-        unless timestamp.nil? || data.nil? 
-          result = { :data => message_to_hex(data.to_i), :timestamp => timestamp.to_i }
-          new_buffer = messages.join(',')
-          @header.write_data(BufferSize, new_buffer)
-          p result
-        end
-      end
-      result
+    def gets
+      @listener.join
+      msgs = @buffer.dup
+      @buffer.clear
+      spawn_listener
+      msgs
     end
-    
-    alias_method :read, :read_buffer
     
     # close the device
     def close
-      reset
-      Map.winmm_func(:midiInUnprepareHeader, @handle, @input_buffer, hdr_size)
+      Thread.kill(@listener)
+      Map.winmm_func(:midiInUnprepareHeader, @handle, @header.pointer, @header.size)
       Map.winmm_func(:midiInStop, @handle)
       Map.winmm_func(:midiInClose, @handle)
       @enabled = false
     end
     
-    # reset the device
-    def reset
-      Map.winmm_func(:midiInReset, @handle)
+    def self.first
+      Device::first(:input)
+    end
+
+    def self.last
+      Device::last(:input)
     end
     
+    def self.all
+      Device.all_by_type[:input]
+    end
+        
     private
+    
+    # launch a background Thread that collects messages
+    def spawn_listener
+      @listener = Thread.fork do
+        while @buffer.empty? do
+          sleep(0.1)
+        end
+      end
+    end
     
     # prepare the header struct where input event information is held
     def init_input_buffer
@@ -86,23 +96,26 @@ module MIDIWinMM
       @header[:dwFlags] = 0
       @header[:dwUser] = 0
     end
-   
-    # this is called when the device receives a message
-    def event_callback
+    
+    # returns a Proc that is called when the device receives a message
+    def get_event_callback
       Proc.new do |hMidiIn,wMsg,dwInstance,dwParam1,dwParam2|
         msg_type = Map::CallbackMessageTypes[wMsg] || ''
-        if [:input_data, :input_long_data].include?(msg_type)
-          # IN PROGRESS
-          if msg_type.eql?(:input_long_data)
-            @receiving_sysex = true
-            p (dwParam1 << 24)
-          end     
-          msg = "#{dwParam2.to_s}##{dwParam1.to_s}"
-          existing_buffer = @header.data
-          msg = (existing_buffer.length.zero? ? "#{existing_buffer}," : '') + msg 
-          @header.write_data(BufferSize, msg)
+        case msg_type
+          when :input_data then 
+        	msg = [{ :data => message_to_hex(dwParam1), :timestamp => dwParam2 }]
+          when :input_long_data then
+          	ptr = FFI::MemoryPointer.new(Map::MIDIHdr.size).write_pointer(dwParam1)
+          	header = Map::MIDIHdr.new(ptr)
+          	p Map::HeaderFlags[@header[:dwFlags]]
+  			#header_ptr = FFI::MemoryPointer.new(:pointer, dwParam1.length).write_pointer(dwParam1)
+  			#header = header_ptr.read_pointer
+  			p 'hi'
+        	@receiving_sysex = true
+        	#p 'hi'
+        	#p header[:dwBytesRecorded]
+            #p header.data
         end
-        nil
       end
     end
     

@@ -8,6 +8,7 @@ module MIDIWinMM
 end
 
 require 'ffi'
+require 'json'
  
 require 'midi-winmm/device'
 require 'midi-winmm/input'
