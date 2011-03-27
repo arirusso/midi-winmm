@@ -4,11 +4,10 @@
 # of the WinMM System API
 #
 module MIDIWinMM
-  VERSION = "0.1"
+  VERSION = "0.0.1"
 end
 
 require 'ffi'
-require 'json'
  
 require 'midi-winmm/device'
 require 'midi-winmm/input'
