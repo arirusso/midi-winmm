@@ -13,7 +13,7 @@ Copyright:: Copyright (c) 2010-2011 Ari Russo
 
 * Summary
 
-Realtime MIDI input and output with Ruby in Windows and Cygwin using the WinMM system API
+Realtime MIDI input and output with Ruby in Windows and Cygwin.  Uses the WinMM system API
 
 * Features
 
