@@ -17,7 +17,7 @@ module MIDIWinMM
       @buffer = []
       @event_callback = get_event_callback
       
-      Map.winmm_func(:midiInOpen, handle_ptr, @id, @event_callback, @header[:lpData].address, Device::WinmmCallbackFlag)
+      Map.winmm_func(:midiInOpen, handle_ptr, @id, @event_callback, 0, Device::WinmmCallbackFlag)
       
       @handle = handle_ptr.read_int
       
@@ -104,17 +104,17 @@ module MIDIWinMM
         case msg_type
           when :input_data then 
         	msg = [{ :data => message_to_hex(dwParam1), :timestamp => dwParam2 }]
+        	@buffer += msg
           when :input_long_data then
-          	ptr = FFI::MemoryPointer.new(Map::MIDIHdr.size).write_pointer(dwParam1)
-          	header = Map::MIDIHdr.new(ptr)
-          	p Map::HeaderFlags[@header[:dwFlags]]
-  			#header_ptr = FFI::MemoryPointer.new(:pointer, dwParam1.length).write_pointer(dwParam1)
-  			#header = header_ptr.read_pointer
-  			p 'hi'
+
         	@receiving_sysex = true
-        	#p 'hi'
-        	#p header[:dwBytesRecorded]
-            #p header.data
+        	p @header[:dwBytesRecorded]
+
+			unless @header.data.eql?("")
+        		@buffer << @header.data 
+        		@header.write_data(BufferSize)
+        	end
+      		
         end
       end
     end

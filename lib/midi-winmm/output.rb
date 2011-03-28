@@ -58,13 +58,13 @@ module MIDIWinMM
     
     def puts(*a)
       case a.first
-        when Array    then puts_bytes(a)
-        when Numeric  then puts_bytes(a) 
-        when String   then puts_bytestr(a)
+        when Array    then puts_bytes(*a.first)
+        when Numeric  then puts_bytes(*a) 
+        when String   then puts_bytestr(*a)
       end
     end
     
-    def puts_bytes(message_bytes)
+    def puts_bytes(*message_bytes)
       format = "C" * message_bytes.size
       
       packed = message_bytes.pack(format)

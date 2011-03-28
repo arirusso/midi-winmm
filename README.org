@@ -2,7 +2,7 @@
 #+TITLE: MIDI WinMM
 #+AUTHOR: Ari Russo
 #+DATE: 2010-12-10 Fri
-#+TEXT: Realtime MIDI input and output with Ruby in Windows and Cygwin
+#+TEXT: Realtime MIDI input and output with Ruby for Windows and Cygwin
 #+KEYWORDS: MIDI, ruby, audio, music, WinMM, windows, SysEx, cygwin, synthesizer, synthesis
 #+LANGUAGE:  en
 #+LINK_HOME: http://github.com/arirusso/midi-winmm
@@ -13,7 +13,7 @@ Copyright:: Copyright (c) 2010-2011 Ari Russo
 
 * Summary
 
-Realtime MIDI input and output with Ruby in Windows and Cygwin.  Uses the WinMM system API
+Realtime MIDI input and output with Ruby for Windows and Cygwin.  Uses the WinMM system API
 
 * Features
 
