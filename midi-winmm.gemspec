@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
  
   s.add_dependency "ffi", ">= 1.0"
 
-  s.files        = Dir.glob("{lib}/**/*") + %w(LICENSE README.org)
+  s.files        = Dir.glob("{lib}/**/*") + %w(LICENSE README.rdoc)
   s.require_path = 'lib'
 end

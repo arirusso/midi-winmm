@@ -112,7 +112,7 @@ module MIDIWinMM
 
 			unless @header.data.eql?("")
         		@buffer << @header.data 
-        		@header.write_data(BufferSize)
+        		p @buffer
         	end
       		
         end
