@@ -43,10 +43,12 @@ module MIDIWinMM
     #
     # returns an array of MIDI event hashes as such:
     # [ 
-    #   { :data => "904040", :timestamp => 1024 },
-    #   { :data => "804040", :timestamp => 1100 },
-    #   { :data => "90607F", :timestamp => 1200 }
+    #   { :data => [144, 90, 100], :timestamp => 1024 },
+    #   { :data => [128, 90, 100], :timestamp => 1100 },
+    #   { :data => [146, 60, 120], :timestamp => 1200 }
     # ]
+    #
+    # message data is an array of Numeric bytes
     #
     def gets
       @listener.join
@@ -54,6 +56,13 @@ module MIDIWinMM
       @buffer.clear
       spawn_listener
       msgs
+    end
+    
+    # same as gets but returns message data as string of hex digits
+    def gets_bytestr
+      msgs = gets
+      msgs.each { |msg| msg[:data] = msg[:data].map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join }
+      msgs	
     end
     
     # close the device
@@ -91,10 +100,11 @@ module MIDIWinMM
     # prepare the header struct where input event information is held
     def init_input_buffer
       @header = Map::MIDIHdr.new
-      @header.write_data(BufferSize)
+      @header.write_data(Input::BufferSize)
       @header[:dwBytesRecorded] = 0
       @header[:dwFlags] = 0
       @header[:dwUser] = 0
+      @header[:dwBufferLength] = Input::BufferSize
     end
     
     # returns a Proc that is called when the device receives a message
@@ -108,11 +118,11 @@ module MIDIWinMM
           when :input_long_data then
 
         	@receiving_sysex = true
-        	p @header[:dwBytesRecorded]
-
-			unless @header.data.eql?("")
-        		@buffer << @header.data 
-        		p @buffer
+			data = @header[:lpData].read_string(Input::BufferSize).gsub(/ /, '')
+			unless data.eql?("")
+			  str = data.unpack(("C" * (data.length-1)))
+			  msg = [{ :data => str, :timestamp => dwParam2 }]
+        	  @buffer += msg
         	end
       		
         end

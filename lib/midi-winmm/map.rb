@@ -84,11 +84,6 @@ module MIDIWinMM
           self[:lpData] = ptr
           self[:dwBufferLength] = string.length
         end
-      
-        def data
-          self[:lpData].read_string.clone.gsub(/ /, '')
-        end
-       
     end
     
     class MIDIInputInfo < FFI::Struct

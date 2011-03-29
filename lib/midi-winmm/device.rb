@@ -58,9 +58,9 @@ module MIDIWinMM
     #
     def message_to_hex(m)
       # there has to be a better way to do this
-      s = ''
+      s = []
       m = m.to_s(16)
-      (1..m.length).step(2) { |i| s << m[(m.length-i)-1, 2] }
+      (1..m.length).step(2) { |i| s << m[(m.length-i)-1, 2].hex }
       s
     end
     
