@@ -16,7 +16,6 @@ Realtime MIDI input and output with Ruby for Windows/Cygwin.  Uses the WinMM sys
 == Requirements
 
 * {ffi}[http://github.com/ffi/ffi] (gem install ffi)
-* Ruby 1.9.2 or newer
 
 == Install
 
