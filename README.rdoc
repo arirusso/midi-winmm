@@ -5,7 +5,7 @@ Copyright:: Copyright (c) 2010-2011 Ari Russo
 
 == Summary
 
-Realtime MIDI input and output with Ruby for Windows and Cygwin.  Uses the WinMM system API
+Realtime MIDI input and output with Ruby for Windows/Cygwin.  Uses the WinMM system API
 
 == Features
 
@@ -29,7 +29,7 @@ gem install midi-winmm
 	
 == Tests
 
-please see {test/config.rb}[http://github.com/arirusso/midi-winmm/blob/master/test/config.rb][test/config.rb] before running tests
+please see {test/config.rb}[http://github.com/arirusso/midi-winmm/blob/master/test/config.rb] before running tests
 	
 == License
 
