@@ -9,7 +9,7 @@ notes = [36, 40, 43] # C E G
 octaves = 6
 duration = 0.1
 
-# MIDIWinMM::Device.all.to_s will list your midi outputs
+# MIDIWinMM::Output.all.to_s will list your midi outputs
   
 MIDIWinMM::Output.first.open do |output|
 

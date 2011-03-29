@@ -8,7 +8,7 @@ require 'midi-winmm'
 
 num_messages = 10
 
-# MIDIWinMM::Device.all.to_s will list your midi outputs
+# MIDIWinMM::Input.all.to_s will list your midi inputs
 
 MIDIWinMM::Input.first.open do |input|
 
