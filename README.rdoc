@@ -29,6 +29,10 @@ gem install midi-winmm
 == Tests
 
 please see {test/config.rb}[http://github.com/arirusso/midi-winmm/blob/master/test/config.rb] before running tests
+
+== Documentation
+
+{rdoc}[http://rdoc.info/gems/midi-winmm]
 	
 == License
 

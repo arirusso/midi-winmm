@@ -4,7 +4,7 @@
 # of the WinMM System API
 #
 module MIDIWinMM
-  VERSION = "0.0.1"
+  VERSION = "0.1.0"
 end
 
 require 'ffi'

@@ -58,7 +58,14 @@ module MIDIWinMM
       msgs
     end
     
-    # same as gets but returns message data as string of hex digits
+    # same as gets but returns message data as string of hex digits as such:
+    # [ 
+    #   { :data => "904060", :timestamp => 904 },
+    #   { :data => "804060", :timestamp => 1150 },
+    #   { :data => "90447F", :timestamp => 1300 }
+    # ]
+    #
+    #
     def gets_bytestr
       msgs = gets
       msgs.each { |msg| msg[:data] = msg[:data].map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join }
