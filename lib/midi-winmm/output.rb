@@ -56,6 +56,7 @@ module MIDIWinMM
       Map.winmm_func(:midiOutReset, @handle)
     end
     
+    # send a message of an indeterminate type
     def puts(*a)
       case a.first
         when Array    then puts_bytes(*a.first)
@@ -64,6 +65,7 @@ module MIDIWinMM
       end
     end
     
+    # send a message consisting of Numeric bytes
     def puts_bytes(*message_bytes)
       format = "C" * message_bytes.size
       
@@ -80,7 +82,7 @@ module MIDIWinMM
       
     end
     
-    # this takes a String of hex digits 
+    # send a message consisisting of a String of hex digits 
     def puts_bytestr(data)
       data = data.dup
 	  output = []
