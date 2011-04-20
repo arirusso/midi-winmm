@@ -7,6 +7,29 @@ module MIDIWinMM
   #
   module Device
     
+
+    # * *Returns* :
+    #   - Fixnum
+    #
+    attr :id
+
+    # * *Returns* :
+    #   - An instance of MIDIInputInfo
+    #   - An instance of MIDIOutputInfo
+    #
+    attr :info
+
+    # * *Returns* :
+    #   - :input
+    #   - :output
+    #
+    attr :type
+
+    # * *Returns* :
+    #   - String
+    #
+    attr :name
+
     def initialize(id, name, options = {}, &block)
       @id = id
       @info = options[:info]
