@@ -7,11 +7,13 @@ Copyright:: Copyright (c) 2010-2011 Ari Russo
 
 Realtime MIDI input and output with Ruby for Windows/Cygwin.  Uses the WinMM system API
 
+Note that in the interest of allowing people on other platforms to utilize your code, you should consider using {unimidi}[http://github.com/arirusso/unimidi].  Unimidi is a platform independent wrapper which implements midi-winmm.  
+
 == Features
 
-* Full input and output
-* Handle all MIDI Message types (including SysEx)
-* Timestamped input messages
+* Input and output on multiple devices concurrently
+* Agnostically handle different MIDI Message types (including SysEx)
+* Timestamped input events
 
 == Requirements
 
