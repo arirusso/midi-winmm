@@ -6,6 +6,8 @@ module MIDIWinMM
   # WinMM driver interface 
   #
   module Device
+
+    attr_reader :id, :info, :name, :type
     
     def initialize(id, name, options = {}, &block)
       @id = id
