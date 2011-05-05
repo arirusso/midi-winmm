@@ -34,6 +34,8 @@ module MIDIWinMM
         ensure
           close
         end
+      else
+        self
       end
       
     end
