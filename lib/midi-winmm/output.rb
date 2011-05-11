@@ -41,7 +41,7 @@ module MIDIWinMM
       
       Map.winmm_func(:midiOutGetVolume, @handle, volume)
       
-      str = message_to_hex(volume.read_ulong)
+      str = dwmsg_to_array_of_bytes(volume.read_ulong)
       left = str.slice!(0,4)
       
       { :left => left.hex, :right => str.hex }

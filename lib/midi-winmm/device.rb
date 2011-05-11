@@ -58,7 +58,7 @@ module MIDIWinMM
     #   High-order byte:  Contains the first byte of MIDI data (when needed).
     #   Low-order byte: Contains the MIDI status.
     #
-    def message_to_hex(m)
+    def dwmsg_to_array_of_bytes(m)
       # there has to be a better way to do this
       s = []
       m = m.to_s(16)
