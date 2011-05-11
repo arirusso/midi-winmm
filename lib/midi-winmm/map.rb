@@ -47,31 +47,24 @@ module MIDIWinMM
       13 => "Invalid Alias"
     }
     
-    module WinTypeAliases
-      # Byte (8 bits). Declared as unsigned char.
-      BYTE = :uchar
-      # 32-bit unsigned integer. The range is 0 through 4,294,967,295 decimal.
-      DWORD = :uint32
-      # Unsigned long type for pointer precision. Use when casting a pointer to a long type.
-      DWORD_PTR = :ulong
-
-      # (L) Handle to an object. WinNT.h: #typedef PVOID HANDLE;
-      HANDLE = :ulong
-
-      # Handle for a MIDI input device.
-      HMIDIIN = HANDLE
-
-      # Handle for a MIDI output device.
-      HMIDIOUT = HANDLE
-
-      MMRESULT = :uint
-
-      # Unsigned INT_PTR.
-      UINT_PTR = :uint
-
-      # 16-bit unsigned integer. The range is 0 through 65535 decimal.
-      WORD = :ushort
-    end
+    # Byte (8 bits). Declared as unsigned char.
+    typedef :uchar, :BYTE
+    # 32-bit unsigned integer. The range is 0 through 4,294,967,295 decimal.
+    typedef :uint32, :DWORD
+    # Unsigned long type for pointer precision. Use when casting a pointer to a long type.
+    typedef :ulong, :DWORD_PTR
+    # (L) Handle to an object. WinNT.h: #typedef PVOID HANDLE;
+    typedef :ulong, :HANDLE
+    # Handle for a MIDI input device.
+    typedef :HANDLE, :HMIDIIN
+    # Handle for a MIDI output device.
+    typedef :HANDLE, :HMIDIOUT
+    # system function result codes
+    typedef :uint, :MMRESULT
+    # Unsigned INT_PTR.
+    typedef :uint, :UINT_PTR
+    # 16-bit unsigned integer. The range is 0 through 65535 decimal.
+    typedef :ushort, :WORD
     
     class MIDIEvent < FFI::Struct
       layout :dwDeltaTime, :ulong,
@@ -81,16 +74,15 @@ module MIDIWinMM
     end
     
     class MIDIHdr < FFI::Struct
-      include WinTypeAliases
       layout :lpData, :pointer,
-        :dwBufferLength, DWORD,
-        :dwBytesRecorded, DWORD,
-        :dwUser, DWORD_PTR,
-        :dwFlags, DWORD,
+        :dwBufferLength, :DWORD,
+        :dwBytesRecorded, :DWORD,
+        :dwUser, :DWORD_PTR,
+        :dwFlags, :DWORD,
         :lpNext, :pointer,
-        :reserved, DWORD_PTR,
-        :dwOffset, DWORD,
-        :dwReserved, DWORD_PTR  
+        :reserved, :DWORD_PTR,
+        :dwOffset, :DWORD,
+        :dwReserved, :DWORD_PTR  
         
         def write_data(size, string = '')
           ptr = FFI::MemoryPointer.new(:char, size)
@@ -102,25 +94,23 @@ module MIDIWinMM
     end
     
     class MIDIInputInfo < FFI::Struct
-      include WinTypeAliases
-      layout :wMid, WORD,
-       :wPid, WORD,
+      layout :wMid, :WORD,
+       :wPid, :WORD,
        :vDriverVersion, :ulong,
        :szPname, [:char, 32],
-       :dwSupport, DWORD
+       :dwSupport, :DWORD
     end
     
     class MIDIOutputInfo < FFI::Struct
-       include WinTypeAliases
-       layout :wMid, WORD,
-         :wPid, WORD,
+       layout :wMid, :WORD,
+         :wPid, :WORD,
          :vDriverVersion, :ulong,
          :szPname, [:char, 32],
-         :wTechnology, WORD,
-         :wVoices, WORD,
-         :wNotes, WORD,
-         :wChannelMask, WORD,
-         :dwSupport, DWORD
+         :wTechnology, :WORD,
+         :wVoices, :WORD,
+         :wNotes, :WORD,
+         :wChannelMask, :WORD,
+         :dwSupport, :DWORD
     end
     
     DeviceInfo = {
@@ -130,13 +120,11 @@ module MIDIWinMM
 
     }
     
-    include WinTypeAliases
-    
     # void CALLBACK MidiInProc(HMIDIIN hMidiIn,UINT wMsg,DWORD_PTR dwInstance,DWORD_PTR dwParam1,DWORD_PTR dwParam2)
-    callback :input_callback, [:pointer, :uint, DWORD_PTR, DWORD_PTR, DWORD_PTR], :void
+    callback :input_callback, [:pointer, :uint, :DWORD_PTR, :DWORD_PTR, :DWORD_PTR], :void
     
     # void CALLBACK MidiOutProc(HMIDIOUT hmo, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
-    callback :output_callback, [:pointer, :uint, DWORD_PTR, DWORD_PTR, DWORD_PTR], :void
+    callback :output_callback, [:pointer, :uint, :DWORD_PTR, :DWORD_PTR, :DWORD_PTR], :void
 
     #
     # initialize/close devices
@@ -144,45 +132,45 @@ module MIDIWinMM
 
     # MMRESULT midiInOpen(LPHMIDIIN lphMidiIn, UINT_PTR uDeviceID, DWORD_PTR dwCallback, DWORD_PTR dwCallbackInstance, DWORD dwFlags)
     # LPHMIDIIN = *HMIDIIN
-    attach_function :midiInOpen, [:pointer, UINT_PTR, :input_callback, DWORD_PTR, DWORD], MMRESULT
+    attach_function :midiInOpen, [:pointer, :UINT_PTR, :input_callback, :DWORD_PTR, :DWORD], :MMRESULT
     
     # MMRESULT midiOutOpen(LPHMIDIOUT lphmo, UINT uDeviceID, DWORD_PTR dwCallback, DWORD_PTR dwCallbackInstance, DWORD dwFlags)
     # LPHMIDIOUT = *HMIDIOUT
     # :output_callback
-    attach_function :midiOutOpen, [:pointer, :uint, :output_callback, DWORD_PTR, DWORD], MMRESULT
+    attach_function :midiOutOpen, [:pointer, :uint, :output_callback, :DWORD_PTR, :DWORD], :MMRESULT
     
     attach_function :midiInClose, [:ulong], :ulong
     attach_function :midiOutClose, [:ulong], :ulong
     attach_function :midiInReset, [:pointer], :ulong
     
     # MMRESULT midiOutReset(HMIDIOUT hmo)
-    attach_function :midiOutReset, [HMIDIOUT], MMRESULT
+    attach_function :midiOutReset, [:HMIDIOUT], :MMRESULT
     
     #
     # for message output
     #
     
     # MMRESULT midiOutShortMsg(HMIDIOUT hmo, DWORD dwMsg)
-    attach_function :midiOutShortMsg, [HMIDIOUT, DWORD], MMRESULT
+    attach_function :midiOutShortMsg, [:HMIDIOUT, :DWORD], :MMRESULT
     
     # MMRESULT midiOutLongMsg(HMIDIOUT hmo, LPMIDIHDR lpMidiOutHdr,UINT cbMidiOutHdr)
     # LPMIDIHDR = *MIDIHDR
-    attach_function :midiOutLongMsg, [HMIDIOUT, :pointer, :uint], MMRESULT
+    attach_function :midiOutLongMsg, [:HMIDIOUT, :pointer, :uint], :MMRESULT
     
     # MMRESULT midiStreamOpen(LPHMIDISTRM lphStream,LPUINT puDeviceID, DWORD cMidi, DWORD_PTR dwCallback, DWORD_PTR dwInstance, DWORD fdwOpen)
-    attach_function :midiStreamOpen, [:pointer, :pointer, DWORD, DWORD_PTR, DWORD_PTR, DWORD], MMRESULT    
+    attach_function :midiStreamOpen, [:pointer, :pointer, :DWORD, :DWORD_PTR, :DWORD_PTR, :DWORD], :MMRESULT    
 
     # MMRESULT midiOutPrepareHeader(HMIDIOUT hmo, LPMIDIHDR lpMidiOutHdr, UINT cbMidiOutHdr)
-    attach_function :midiOutPrepareHeader, [HMIDIOUT, :pointer, :uint], MMRESULT
+    attach_function :midiOutPrepareHeader, [:HMIDIOUT, :pointer, :uint], :MMRESULT
     
     #MMRESULT midiOutUnprepareHeader(HMIDIOUT hmo, LPMIDIHDR lpMidiOutHdr, UINT cbMidiOutHdr)
-    attach_function :midiOutUnprepareHeader, [HMIDIOUT, :ulong, :uint], MMRESULT
+    attach_function :midiOutUnprepareHeader, [:HMIDIOUT, :ulong, :uint], :MMRESULT
     
     #MMRESULT midiOutGetVolume(HMIDIOUT hmo, LPDWORD lpdwVolume)
-    attach_function :midiOutGetVolume, [HMIDIOUT, :pointer], MMRESULT
+    attach_function :midiOutGetVolume, [:HMIDIOUT, :pointer], :MMRESULT
     
     # MMRESULT midiOutSetVolume(HMIDIOUT hmo, DWORD dwVolume)
-    attach_function :midiOutSetVolume, [HMIDIOUT, DWORD], MMRESULT
+    attach_function :midiOutSetVolume, [:HMIDIOUT, :DWORD], :MMRESULT
     
     #
     # input
