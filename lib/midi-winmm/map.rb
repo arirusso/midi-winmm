@@ -177,16 +177,16 @@ module MIDIWinMM
     #
 
     # MMRESULT midiInPrepareHeader(HMIDIIN hMidiIn, LPMIDIHDR lpMidiInHdr, UINT cbMidiInHdr)
-    attach_function :midiInPrepareHeader, [HMIDIIN, :pointer, :uint], MMRESULT
+    attach_function :midiInPrepareHeader, [:HMIDIIN, :pointer, :uint], :MMRESULT
     
-    attach_function :midiInUnprepareHeader, [HMIDIIN, :pointer, :uint], MMRESULT
-    attach_function :midiInAddBuffer, [HMIDIIN, :pointer, :uint], MMRESULT
+    attach_function :midiInUnprepareHeader, [:HMIDIIN, :pointer, :uint], :MMRESULT
+    attach_function :midiInAddBuffer, [:HMIDIIN, :pointer, :uint], :MMRESULT
     
     # MMRESULT midiInStart(HMIDIIN hMidiIn)
-    attach_function :midiInStart, [HMIDIIN], MMRESULT
+    attach_function :midiInStart, [:HMIDIIN], :MMRESULT
     
     # MMRESULT midiInStop(HMIDIIN hMidiIn)
-    attach_function :midiInStop, [HMIDIIN], MMRESULT
+    attach_function :midiInStop, [:HMIDIIN], :MMRESULT
     
     #
     # enumerate devices
@@ -199,9 +199,9 @@ module MIDIWinMM
     attach_function :midiOutGetNumDevs, [], :uint
     
     # MMRESULT midiInGetDevCaps(UINT_PTR uDeviceID, LPMIDIINCAPS lpMidiInCaps, UINT cbMidiInCaps);
-    attach_function :midiInGetDevCapsA, [UINT_PTR, :pointer, :uint], MMRESULT
+    attach_function :midiInGetDevCapsA, [:UINT_PTR, :pointer, :uint], :MMRESULT
     
-    attach_function :midiOutGetDevCapsA, [UINT_PTR, :pointer, :uint], MMRESULT
+    attach_function :midiOutGetDevCapsA, [:UINT_PTR, :pointer, :uint], :MMRESULT
    
     # shortcut for calling winmm midi functions
     def self.cfunc(type, funcname, *args)
