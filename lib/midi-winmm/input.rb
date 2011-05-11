@@ -10,11 +10,13 @@ module MIDIWinMM
     
     BufferSize = 2048
     
+    attr_reader :buffer
+    
     # initializes this device
     def enable(options = {}, &block)
       init_input_buffer
       handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
-      @buffer = []
+      initialize_local_buffer
       @event_callback = get_event_callback
       
       Map.winmm_func(:midiInOpen, handle_ptr, @id, @event_callback, 0, Device::WinmmCallbackFlag)
@@ -54,8 +56,8 @@ module MIDIWinMM
     #
     def gets
       @listener.join
-      msgs = @buffer.dup
-      @buffer.clear
+      msgs = @buffer.slice(@pointer, @buffer.length - @pointer)
+      @pointer = @buffer.length - 1
       spawn_listener
       msgs
     end
@@ -70,7 +72,7 @@ module MIDIWinMM
     #
     def gets_s
       msgs = gets
-      msgs.each { |msg| msg[:data] = msg[:data].map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join }
+      msgs.each { |msg| msg[:data] = numeric_bytes_to_hex_string(msg[:data]) }
       msgs	
     end
     alias_method :gets_bytestr, :gets_s
@@ -124,21 +126,32 @@ module MIDIWinMM
         msg_type = Map::CallbackMessageTypes[wMsg] || ''
         case msg_type
           when :input_data then 
-        	msg = [{ :data => message_to_hex(dwParam1), :timestamp => dwParam2 }]
-        	@buffer += msg
-          when :input_long_data then
-
-        	@receiving_sysex = true
-			data = @header[:lpData].read_string(Input::BufferSize).gsub(/ /, '')
-			unless data.eql?("")
-			  str = data.unpack(("C" * (data.length-1)))
-			  msg = [{ :data => str, :timestamp => dwParam2 }]
+        	  msg = [{ :data => dwmsg_to_array_of_bytes(dwParam1), :timestamp => dwParam2 }]
         	  @buffer += msg
-        	end
-      		
+          when :input_long_data then
+        	  @receiving_sysex = true
+			      data = @header[:lpData].read_string(Input::BufferSize).gsub(/ /, '')
+			      unless data.eql?("")
+			        str = data.unpack(("C" * (data.length-1)))
+			        msg = [{ :data => str, :timestamp => dwParam2 }]
+        	    @buffer += msg
+        	  end      		
         end
       end
     end
+    
+    def initialize_local_buffer
+      @pointer = 0
+      @buffer = []
+      def @buffer.clear
+        super
+        @pointer = 0
+      end
+    end
+    
+    def numeric_bytes_to_hex_string(bytes)
+      bytes.map { |b| s = b.to_s(16).upcase; b < 16 ? s = "0" + s : s; s }.join
+    end 
     
   end
   
