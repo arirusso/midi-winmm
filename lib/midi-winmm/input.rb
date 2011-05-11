@@ -57,7 +57,7 @@ module MIDIWinMM
     def gets
       @listener.join
       msgs = @buffer.slice(@pointer, @buffer.length - @pointer)
-      @pointer = @buffer.length - 1
+      @pointer = @buffer.length
       spawn_listener
       msgs
     end
@@ -88,11 +88,11 @@ module MIDIWinMM
     end
     
     def self.first
-      Device::first(:input)
+      Device.first(:input)
     end
 
     def self.last
-      Device::last(:input)
+      Device.last(:input)
     end
     
     def self.all
@@ -104,8 +104,9 @@ module MIDIWinMM
     # launch a background Thread that collects messages
     def spawn_listener
       @listener = Thread.fork do
-        while @buffer.empty? do
-          sleep(0.1)
+        len = @buffer.length
+        while @buffer.length.eql?(len) do
+          sleep(0.05)
         end
       end
     end
@@ -126,15 +127,15 @@ module MIDIWinMM
         msg_type = Map::CallbackMessageTypes[wMsg] || ''
         case msg_type
           when :input_data then 
-        	  msg = [{ :data => dwmsg_to_array_of_bytes(dwParam1), :timestamp => dwParam2 }]
-        	  @buffer += msg
+        	  msg = { :data => dwmsg_to_array_of_bytes(dwParam1), :timestamp => dwParam2 }
+        	  @buffer << msg
           when :input_long_data then
         	  @receiving_sysex = true
 			      data = @header[:lpData].read_string(Input::BufferSize).gsub(/ /, '')
 			      unless data.eql?("")
 			        str = data.unpack(("C" * (data.length-1)))
-			        msg = [{ :data => str, :timestamp => dwParam2 }]
-        	    @buffer += msg
+			        msg = { :data => str, :timestamp => dwParam2 }
+        	    @buffer << msg
         	  end      		
         end
       end
