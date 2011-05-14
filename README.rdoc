@@ -1,8 +1,5 @@
 = midi-winmm
 
-Author:: Ari Russo
-Copyright:: Copyright (c) 2010-2011 Ari Russo
-
 == Summary
 
 Realtime MIDI input and output with Ruby for Windows/Cygwin.  Uses the WinMM system API
@@ -21,12 +18,14 @@ Note that in the interest of allowing people on other platforms to utilize your 
 
 == Install
 
-gem install midi-winmm
+  gem install midi-winmm
 	
 == Examples
 
 * {input}[http://github.com/arirusso/midi-winmm/blob/master/examples/input.rb]
 * {output}[http://github.com/arirusso/midi-winmm/blob/master/examples/output.rb]
+
+({more}[http://github.com/arirusso/midi-winmm/blob/master/examples])
 	
 == Tests
 
@@ -36,6 +35,12 @@ please see {test/config.rb}[http://github.com/arirusso/midi-winmm/blob/master/te
 
 {rdoc}[http://rdoc.info/gems/midi-winmm]
 	
+== Author 
+
+{Ari Russo}[http://github.com/arirusso] <ari.russo at gmail.com>
+		
 == License
 
-Apache 2.0, See the file LICENSE  
+Apache 2.0, See the file LICENSE
+
+Copyright (c) 2010-2011 Ari Russo  
