@@ -36,7 +36,7 @@ class InputBufferTest < Test::Unit::TestCase
 
         end
         
-        assert_equal(input.buffer.length, messages.length)
+        assert_equal(bytes.length, input.buffer.map { |m| m[:data] }.flatten.length)
 
       end
     end
