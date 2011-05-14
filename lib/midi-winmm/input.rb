@@ -8,7 +8,7 @@ module MIDIWinMM
     
     include Device
     
-    BufferSize = 2048
+    BufferSize = 256
     
     attr_reader :buffer
     
@@ -27,7 +27,6 @@ module MIDIWinMM
       Map.winmm_func(:midiInAddBuffer, @handle, @header.pointer, @header.size)
       Map.winmm_func(:midiInStart, @handle)
 
-      spawn_listener
       @enabled = true
       
       unless block.nil?
@@ -55,10 +54,10 @@ module MIDIWinMM
     # message data is an array of Numeric bytes
     #
     def gets
-      @listener.join
-      msgs = @buffer.slice(@pointer, @buffer.length - @pointer)
+      until queued_messages?
+      end
+      msgs = queued_messages
       @pointer = @buffer.length
-      spawn_listener
       msgs
     end
     
@@ -80,7 +79,6 @@ module MIDIWinMM
     
     # close the device
     def close
-      Thread.kill(@listener)
       Map.winmm_func(:midiInUnprepareHeader, @handle, @header.pointer, @header.size)
       Map.winmm_func(:midiInStop, @handle)
       Map.winmm_func(:midiInClose, @handle)
@@ -101,16 +99,14 @@ module MIDIWinMM
         
     private
     
-    # launch a background Thread that collects messages
-    def spawn_listener
-      @listener = Thread.fork do
-        len = @buffer.length
-        while @buffer.length.eql?(len) do
-          sleep(0.05)
-        end
-      end
+    def queued_messages
+      @buffer.slice(@pointer, @buffer.length - @pointer)
     end
     
+    def queued_messages?
+      @pointer < @buffer.length
+    end
+            
     # prepare the header struct where input event information is held
     def init_input_buffer
       @header = Map::MIDIHdr.new
