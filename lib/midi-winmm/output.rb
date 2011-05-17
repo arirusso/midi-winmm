@@ -9,6 +9,8 @@ module MIDIWinMM
     include Device
     
     BufferSize = 2048
+    
+    attr_reader :buffer
    
     # initialize this device
     def enable(options = {}, &block)
@@ -18,7 +20,7 @@ module MIDIWinMM
       @enabled = true
       unless block.nil?
         begin
-          block.call(self)
+          yield(self)
         ensure
           close
         end
