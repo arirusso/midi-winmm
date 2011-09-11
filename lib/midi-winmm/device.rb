@@ -7,7 +7,9 @@ module MIDIWinMM
   #
   module Device
 
-    attr_reader :id, :info, :name, :type
+    attr_reader :enabled, :id, :info, :name, :type
+    
+    alias_method :enabled?, :enabled
     
     def initialize(id, name, options = {}, &block)
       @id = id
