@@ -26,7 +26,6 @@ module MIDIWinMM
       types = { :input => Input,
               :output => Output }
       available_devices = { :input => [], :output => [] }
-      count = 0
       types.each do |type, klass|
        (0..(Map::cfunc(type, :getNumDevs)-1)).each do |i|
           data = Map::DeviceInfo[type].new
