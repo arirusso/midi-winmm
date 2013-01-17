@@ -123,16 +123,16 @@ module MIDIWinMM
         msg_type = Map::CallbackMessageTypes[wMsg] || ''
         case msg_type
           when :input_data then 
-        	  msg = { :data => dwmsg_to_array_of_bytes(dwParam1), :timestamp => dwParam2 }
-        	  @buffer << msg
+            msg = { :data => dwmsg_to_array_of_bytes(dwParam1), :timestamp => dwParam2 }
+            @buffer << msg
           when :input_long_data then
-        	  @receiving_sysex = true
-			      data = @header[:lpData].read_string(Input::BufferSize).gsub(/ /, '')
-			      unless data.eql?("")
-			        str = data.unpack(("C" * (data.length-1)))
-			        msg = { :data => str, :timestamp => dwParam2 }
-        	    @buffer << msg
-        	  end      		
+            @receiving_sysex = true
+            data = @header[:lpData].read_string(Input::BufferSize).gsub(/ /, '')
+            unless data.eql?("")
+              str = data.unpack(("C" * (data.length-1)))
+              msg = { :data => str, :timestamp => dwParam2 }
+              @buffer << msg
+            end
         end
       end
     end
