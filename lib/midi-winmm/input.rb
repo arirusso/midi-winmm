@@ -54,11 +54,14 @@ module MIDIWinMM
     # message data is an array of Numeric bytes
     #
     def gets
-      until queued_messages?
+      if @buffer.empty?
+        [@buffer.pop] # block on purpose - for backwards compatibility
+      else
+        msgs = []
+        msgs << @buffer.pop  until @buffer.empty?
+
+        msgs
       end
-      msgs = queued_messages
-      @pointer = @buffer.length
-      msgs
     end
     
     # same as gets but returns message data as string of hex digits as such:
@@ -99,14 +102,6 @@ module MIDIWinMM
         
     private
     
-    def queued_messages
-      @buffer.slice(@pointer, @buffer.length - @pointer)
-    end
-    
-    def queued_messages?
-      @pointer < @buffer.length
-    end
-            
     # prepare the header struct where input event information is held
     def init_input_buffer
       @header = Map::MIDIHdr.new
@@ -138,12 +133,7 @@ module MIDIWinMM
     end
     
     def initialize_local_buffer
-      @pointer = 0
-      @buffer = []
-      def @buffer.clear
-        super
-        @pointer = 0
-      end
+      @buffer = Thread::Queue.new
     end
     
     def numeric_bytes_to_hex_string(bytes)
