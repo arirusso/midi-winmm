@@ -15,13 +15,13 @@ module MIDIWinMM
     # initializes this device
     def enable(options = {}, &block)
       init_input_buffer
-      handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:int))
+      handle_ptr = FFI::MemoryPointer.new(FFI.type_size(:pointer))
       initialize_local_buffer
       @event_callback = get_event_callback
       
       Map.winmm_func(:midiInOpen, handle_ptr, @id, @event_callback, 0, Device::WinmmCallbackFlag)
       
-      @handle = handle_ptr.read_int
+      @handle = handle_ptr.read_pointer
       
       Map.winmm_func(:midiInPrepareHeader, @handle, @header.pointer, @header.size)      
       Map.winmm_func(:midiInAddBuffer, @handle, @header.pointer, @header.size)
@@ -54,11 +54,14 @@ module MIDIWinMM
     # message data is an array of Numeric bytes
     #
     def gets
-      until queued_messages?
+      if @buffer.empty?
+        [@buffer.pop] # block on purpose - for backwards compatibility
+      else
+        msgs = []
+        msgs << @buffer.pop  until @buffer.empty?
+
+        msgs
       end
-      msgs = queued_messages
-      @pointer = @buffer.length
-      msgs
     end
     
     # same as gets but returns message data as string of hex digits as such:
@@ -99,14 +102,6 @@ module MIDIWinMM
         
     private
     
-    def queued_messages
-      @buffer.slice(@pointer, @buffer.length - @pointer)
-    end
-    
-    def queued_messages?
-      @pointer < @buffer.length
-    end
-            
     # prepare the header struct where input event information is held
     def init_input_buffer
       @header = Map::MIDIHdr.new
@@ -123,7 +118,7 @@ module MIDIWinMM
         msg_type = Map::CallbackMessageTypes[wMsg] || ''
         case msg_type
           when :input_data then 
-        	  msg = { :data => dwmsg_to_array_of_bytes(dwParam1), :timestamp => dwParam2 }
+        	  msg = { :data => dwmsg_to_array_of_bytes(dwParam1.address), :timestamp => dwParam2.address }
         	  @buffer << msg
           when :input_long_data then
         	  @receiving_sysex = true
@@ -138,12 +133,7 @@ module MIDIWinMM
     end
     
     def initialize_local_buffer
-      @pointer = 0
-      @buffer = []
-      def @buffer.clear
-        super
-        @pointer = 0
-      end
+      @buffer = Thread::Queue.new
     end
     
     def numeric_bytes_to_hex_string(bytes)

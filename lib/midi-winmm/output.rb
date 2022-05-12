@@ -16,7 +16,7 @@ module MIDIWinMM
     def enable(options = {}, &block)
       init_output_buffer
       Map.winmm_func(:midiOutOpen, Output::HandlePointer, @id, Output::EventCallback, 0, Device::WinmmCallbackFlag)
-      @handle = HandlePointer.read_int
+      @handle = HandlePointer.read_pointer
       @enabled = true
       unless block.nil?
         begin
@@ -116,12 +116,12 @@ module MIDIWinMM
       msg_type = Map::CallbackMessageTypes[wMsg] || ''
       if msg_type.eql?(:output_data)
         header = dwParam1
-        handle = HandlePointer.read_int
+        handle = HandlePointer.read_pointer
         Map.winmm_func(:midiOutUnprepareHeader, handle, header, Map::MIDIHdr.size)
       end
     end
     
-    HandlePointer = FFI::MemoryPointer.new(FFI.type_size(:int))
+    HandlePointer = FFI::MemoryPointer.new(FFI.type_size(:pointer))
     
     def init_output_buffer
       @header = Map::MIDIHdr.new

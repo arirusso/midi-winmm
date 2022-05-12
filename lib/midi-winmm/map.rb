@@ -54,7 +54,7 @@ module MIDIWinMM
     # Unsigned long type for pointer precision. Use when casting a pointer to a long type.
     typedef :ulong, :DWORD_PTR
     # (L) Handle to an object. WinNT.h: #typedef PVOID HANDLE;
-    typedef :ulong, :HANDLE
+    typedef :pointer, :HANDLE
     # Handle for a MIDI input device.
     typedef :HANDLE, :HMIDIIN
     # Handle for a MIDI output device.
@@ -121,10 +121,10 @@ module MIDIWinMM
     }
     
     # void CALLBACK MidiInProc(HMIDIIN hMidiIn,UINT wMsg,DWORD_PTR dwInstance,DWORD_PTR dwParam1,DWORD_PTR dwParam2)
-    callback :input_callback, [:pointer, :uint, :DWORD_PTR, :DWORD_PTR, :DWORD_PTR], :void
+    callback :input_callback, [:HMIDIIN, :uint, :pointer, :pointer, :pointer], :void
     
     # void CALLBACK MidiOutProc(HMIDIOUT hmo, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2)
-    callback :output_callback, [:pointer, :uint, :DWORD_PTR, :DWORD_PTR, :DWORD_PTR], :void
+    callback :output_callback, [:HMIDIOUT, :uint, :pointer, :pointer, :pointer], :void
 
     #
     # initialize/close devices
@@ -132,16 +132,16 @@ module MIDIWinMM
 
     # MMRESULT midiInOpen(LPHMIDIIN lphMidiIn, UINT_PTR uDeviceID, DWORD_PTR dwCallback, DWORD_PTR dwCallbackInstance, DWORD dwFlags)
     # LPHMIDIIN = *HMIDIIN
-    attach_function :midiInOpen, [:pointer, :UINT_PTR, :input_callback, :DWORD_PTR, :DWORD], :MMRESULT
+    attach_function :midiInOpen, [:pointer, :uint, :input_callback, :DWORD_PTR, :DWORD], :MMRESULT
     
     # MMRESULT midiOutOpen(LPHMIDIOUT lphmo, UINT uDeviceID, DWORD_PTR dwCallback, DWORD_PTR dwCallbackInstance, DWORD dwFlags)
     # LPHMIDIOUT = *HMIDIOUT
     # :output_callback
     attach_function :midiOutOpen, [:pointer, :uint, :output_callback, :DWORD_PTR, :DWORD], :MMRESULT
     
-    attach_function :midiInClose, [:ulong], :ulong
-    attach_function :midiOutClose, [:ulong], :ulong
-    attach_function :midiInReset, [:pointer], :ulong
+    attach_function :midiInClose, [:HMIDIIN], :ulong
+    attach_function :midiOutClose, [:HMIDIOUT], :ulong
+    attach_function :midiInReset, [:HMIDIIN], :ulong
     
     # MMRESULT midiOutReset(HMIDIOUT hmo)
     attach_function :midiOutReset, [:HMIDIOUT], :MMRESULT
@@ -164,7 +164,7 @@ module MIDIWinMM
     attach_function :midiOutPrepareHeader, [:HMIDIOUT, :pointer, :uint], :MMRESULT
     
     #MMRESULT midiOutUnprepareHeader(HMIDIOUT hmo, LPMIDIHDR lpMidiOutHdr, UINT cbMidiOutHdr)
-    attach_function :midiOutUnprepareHeader, [:HMIDIOUT, :ulong, :uint], :MMRESULT
+    attach_function :midiOutUnprepareHeader, [:HMIDIOUT, :pointer, :uint], :MMRESULT
     
     #MMRESULT midiOutGetVolume(HMIDIOUT hmo, LPDWORD lpdwVolume)
     attach_function :midiOutGetVolume, [:HMIDIOUT, :pointer], :MMRESULT
